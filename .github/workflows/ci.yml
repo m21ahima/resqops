@@ -1,0 +1,29 @@
+name: CI Pipeline
+
+# Run this workflow every time code is pushed to the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Get the code from the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js on the runner
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Build the Docker image (proves the Dockerfile works)
+      - name: Build Docker image
+        run: docker build -t resqops:ci .
