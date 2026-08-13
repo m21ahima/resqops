@@ -1,20 +1,17 @@
-# Use an official lightweight Node.js image as the base
 FROM node:20-alpine
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy dependency files first (before app code)
 COPY package*.json ./
-
-# Install dependencies inside the container
 RUN npm install --production
-
-# Now copy the rest of the app code
 COPY . .
 
-# Tell Docker which port the app listens on
 EXPOSE 3000
 
-# Command to run when the container starts
+# Docker will run this command periodically INSIDE the container
+# to decide if the app is healthy. If it fails repeatedly, the
+# container is marked "unhealthy".
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
 CMD ["node", "index.js"]
