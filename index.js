@@ -2,6 +2,7 @@ const express = require('express');
 const client = require('prom-client');
 
 const app = express();
+app.use(express.static('public'));
 const PORT = process.env.PORT || 3000;
 
 client.collectDefaultMetrics();
@@ -34,9 +35,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-app.get('/', (req, res) => {
-  res.send('ResQOps is running');
-});
+
 
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', client.register.contentType);

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ResQOps Dashboard</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f1117;
+    color: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+  }
+  h1 { color: #4dabf7; }
+  .card {
+    background: #1a1d27;
+    border-radius: 12px;
+    padding: 24px 40px;
+    margin: 16px 0;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  }
+  .status {
+    font-size: 22px;
+    font-weight: bold;
+    padding: 8px 0;
+  }
+  .healthy { color: #51cf66; }
+  .unhealthy { color: #ff6b6b; }
+  .uptime { color: #adb5bd; font-size: 14px; }
+  button {
+    margin: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .crash-btn { background: #ff6b6b; color: white; }
+  .recover-btn { background: #51cf66; color: white; }
+  .links a {
+    color: #4dabf7;
+    display: block;
+    margin: 4px 0;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>🛟 ResQOps Dashboard</h1>
+
+<div class="card">
+  <div id="status" class="status">Checking...</div>
+  <div id="uptime" class="uptime"></div>
+</div>
+
+<div>
+  <button class="crash-btn" onclick="simulateCrash()">Simulate Crash</button>
+  <button class="recover-btn" onclick="recover()">Manual Recover</button>
+</div>
+
+<div class="card links">
+  <strong>Monitoring links</strong>
+  <a href="http://18.60.242.119:9090" target="_blank">Prometheus</a>
+  <a href="http://18.60.242.119:3030" target="_blank">Grafana</a>
+</div>
+
+<script>
+async function refreshStatus() {
+  try {
+    const res = await fetch('/health');
+    const data = await res.json();
+    const statusEl = document.getElementById('status');
+    const uptimeEl = document.getElementById('uptime');
+
+    if (data.status === 'ok') {
+      statusEl.textContent = '🟢 HEALTHY';
+      statusEl.className = 'status healthy';
+    } else {
+      statusEl.textContent = '🔴 UNHEALTHY';
+      statusEl.className = 'status unhealthy';
+    }
+    uptimeEl.textContent = `Uptime: ${data.uptime.toFixed(1)}s`;
+  } catch (err) {
+    document.getElementById('status').textContent = '⚪ UNREACHABLE';
+  }
+}
+
+async function simulateCrash() {
+  await fetch('/simulate-crash');
+  refreshStatus();
+}
+
+async function recover() {
+  await fetch('/recover');
+  refreshStatus();
+}
+
+// Poll every 3 seconds so the dashboard updates live
+setInterval(refreshStatus, 3000);
+refreshStatus();
+</script>
+
+</body>
+</html>
