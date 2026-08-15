@@ -22,3 +22,15 @@ watch the status flip to unhealthy, then automatically recover within ~40
 seconds as the watcher script detects and restarts the container.
 
 ## Architecture
+
+Developer → GitHub → GitHub Actions → Docker Hub → AWS EC2
+↓
+Nginx → Node.js App → Prometheus → Grafana
+↓
+Docker Healthcheck → Watcher Script
+↓
+Auto-restart on failure
+
+## Tech stack
+
+Node.js · Express · Docker · GitHub Actions · AWS EC2 · Nginx · Prometheus · Grafana
